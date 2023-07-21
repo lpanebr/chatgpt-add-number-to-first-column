@@ -1,6 +1,6 @@
 import sys
 
-def process_line(line, increment):
+def process_line(line, increment, column_widths):
     if line.startswith('#'):
         return line  # Preserve the commented lines as they are
 
@@ -9,11 +9,10 @@ def process_line(line, increment):
         return None  # Ignore lines with incorrect format
 
     try:
-        num1 = int(columns[0])
-        num1 += increment
+        num1 = int(columns[0]) + increment
         num2 = float(columns[1])
         num3 = float(columns[2])
-        return f"{num1}\t{num2}\t{num3}\n"
+        return "{:<{}} {:<{}} {:<{}}\n".format(num1, column_widths[0], num2, column_widths[1], num3, column_widths[2])
     except ValueError:
         return None  # Ignore lines with non-numeric values
 
@@ -21,9 +20,14 @@ def main(filename, increment):
     try:
         increment = int(increment)
         with open(filename, 'r') as file:
+            lines = file.readlines()
+
+            # Find the maximum width of each column
+            column_widths = [max(len(column.strip()) for column in line.split()) for line in lines if not line.startswith('#')]
+            
             output = ""
-            for line in file:
-                processed_line = process_line(line.strip(), increment)
+            for line in lines:
+                processed_line = process_line(line.strip(), increment, column_widths)
                 if processed_line is not None:
                     output += processed_line
 
@@ -44,4 +48,3 @@ if __name__ == "__main__":
         filename = sys.argv[1]
         increment = sys.argv[2]
         main(filename, increment)
-
