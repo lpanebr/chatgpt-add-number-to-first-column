@@ -26,10 +26,18 @@ def main(filename, increment):
             column_widths = [max(len(column.strip()) for column in line.split()) for line in lines if not line.startswith('#')]
             
             output = ""
+            is_comment = False
             for line in lines:
-                processed_line = process_line(line.strip(), increment, column_widths)
-                if processed_line is not None:
-                    output += processed_line
+                if line.startswith('#'):
+                    output += line
+                    is_comment = True
+                elif is_comment:
+                    output += line
+                    is_comment = False
+                else:
+                    processed_line = process_line(line.strip(), increment, column_widths)
+                    if processed_line is not None:
+                        output += processed_line
 
         # Output the processed data to the console or a new file
         print(output)
@@ -48,3 +56,4 @@ if __name__ == "__main__":
         filename = sys.argv[1]
         increment = sys.argv[2]
         main(filename, increment)
+
